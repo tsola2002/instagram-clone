@@ -243,7 +243,6 @@ function App() {
         
       </div>
       
-      <h1>hello isaac lets build an instagram clone 🚀 🚀 </h1>
       
       
 
