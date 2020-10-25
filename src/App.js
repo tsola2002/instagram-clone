@@ -5,6 +5,10 @@ import { db,auth } from './firebase';
 import Modal from '@material-ui/core/Modal';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, Input } from '@material-ui/core';
+import ImageUpload from './ImageUpload';
+import InstagramEmbed from 'react-instagram-embed';
+import firebase from "firebase";
+
 
 function getModalStyle() {
   const top = 50;
@@ -73,7 +77,9 @@ function App() {
   useEffect(() => {
     // this is where the code runs
     // everytime a document gets changed it takes a snapshot
-    db.collection('posts').onSnapshot(snapshot => {
+    db.collection('posts')
+                        .orderBy('timestamp', 'desc')
+                        .onSnapshot(snapshot => {
       // form the snapshot get the docs and map through the items
       // convert it into an object to make it easier to pull data
       setPosts(snapshot.docs.map(doc => ({
@@ -118,7 +124,7 @@ function App() {
 
   return (
     <div className="app">
-
+    
     <Modal
       open={open}
       onClose={() => setOpen(false)}
@@ -197,27 +203,55 @@ function App() {
           alt=""
           src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png"
         />
+
+        {user ? (
+          <Button onClick={() => auth.signOut()}>Logout</Button>
+  
+        ) : (
+          <div className="app__loginContainer">
+          <Button onClick={() => setOpenSignIn(true)}>Sign In</Button>
+          <Button onClick={() => setOpen(true)}>Sign Up</Button>
+          </div>
+        )}
       </div> 
 
-      {user ? (
-        <Button onClick={() => auth.signOut()}>Logout</Button>
+      <div className="app__posts">
+          <div className="app_postsLeft">
+          {
+            // we map through the posts using objects with keys
+            posts.map(({id, post}) => (
+              <Post key={id} postId={id} user={user} username={post.username} caption={post.caption} imageUrl={post.imageUrl} />  
+            ))
+          }
+          </div>
+        
+          <div className="app_postsRight">
+          <InstagramEmbed
+          url='https://www.instagram.com/p/BuEmbsKH_zC/?utm_source=ig_web_copy_link/'
+          maxWidth={320}
+          hideCaption={false}
+          containerTagName='div'
+          protocol=''
+          injectScript
+          onLoading={() => {}}
+          onSuccess={() => {}}
+          onAfterRender={() => {}}
+          onFailure={() => {}}
+          />
+          </div>
 
-      ) : (
-        <div className="app__loginContainer">
-        <Button onClick={() => setOpenSignIn(true)}>Sign In</Button>
-        <Button onClick={() => setOpen(true)}>Sign Up</Button>
-        </div>
-      )}
+        
+      </div>
       
       <h1>hello isaac lets build an instagram clone 🚀 🚀 </h1>
       
-      {
-        // we map through the posts using objects with keys
-        posts.map(({id, post}) => (
-          <Post key={id} username={post.username} caption={post.caption} imageUrl={post.imageUrl} />  
-        ))
-      }
+      
 
+      {user?.displayName ? (
+        <ImageUpload username={user.displayName} />
+      ): (
+        <h3> Sorry you need to login to upload</h3>
+      )}
 
 
     </div>
