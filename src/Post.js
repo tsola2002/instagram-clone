@@ -14,7 +14,7 @@ function Post({ username, caption, imageUrl }) {
                 <h3>{username}</h3>
             </div>
             
-            <img className="post__image" src="https://image.tmdb.org/t/p/original//xGexTKCJDkl12dTW4YCBDXWb1AD.jpg" />
+            <img className="post__image" src={imageUrl} />
             <h4 className="post__text"><strong>{username}</strong>{caption}</h4>    
         </div>
     )
